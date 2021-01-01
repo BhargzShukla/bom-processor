@@ -1,0 +1,4 @@
+openpyxl
+pandas
+black
+pre-commit
