@@ -1,0 +1,7 @@
+COL_ITEM_NAME = "Item Name"
+COL_LEVEL = "Level"
+COL_RAW_MATERIALS = "Raw material"
+COL_QUANTITY = "Quantity"
+COL_UNIT = "Unit"
+COL_ITEM_DESC = "Item Description"
+COL_SERIAL = "#"
