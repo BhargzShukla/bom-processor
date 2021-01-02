@@ -14,6 +14,7 @@ DATA_FILE = "data/data_clean.xlsx"
 
 source_sheet, source_workbook = load_data_from_file(DATA_FILE)
 source_data = get_data_from_source_sheet(source_sheet)
+
 processed_items = flatten(source_data)
 
 data = pd.DataFrame(processed_items)

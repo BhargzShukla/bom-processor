@@ -1,3 +1,5 @@
+from collections import deque
+
 from openpyxl import load_workbook
 
 from src.classes import Item
@@ -19,8 +21,8 @@ def load_data_from_file(data_file):
 def get_data_from_source_sheet(sheet):
     """
     Convert the source spreadsheet data into a list of `Item`s.
-    :param sheet:
-    :return:
+    :param sheet: The source spreadsheet.
+    :return: list
     """
     source_data = []
     for row in sheet.iter_rows(min_row=2, values_only=True):
@@ -39,25 +41,27 @@ def get_data_from_source_sheet(sheet):
 def flatten(source):
     """
     Flatten the source dataset. Converts each item into a top level item with the appropriate raw material.
-    :param source: The raw item list
+    :param source: The raw item list.
     :return: list
     """
     processed_items = []
-    last_top_processed = None
+    last_top_processed = deque()
     for idx, item in enumerate(source):
         prev_item = source[idx - 1] if idx > 0 else item
         if item.level == "1":
             processed_items.append(item)
-            last_top_processed = item
+            last_top_processed.append(item)
         elif item.level > prev_item.level:
+            last_top = last_top_processed.pop()
             new_item = Item(
                 name=prev_item.raw_material,
-                level=last_top_processed.level,
+                level=last_top.level,
                 raw_material=item.raw_material,
                 quantity=item.quantity,
                 unit=item.unit,
             )
             processed_items.append(new_item)
+            last_top_processed.append(last_top)
         elif item.level == prev_item.level:
             new_item = Item(
                 name=processed_items[-1].name,
@@ -67,6 +71,17 @@ def flatten(source):
                 unit=item.unit,
             )
             processed_items.append(new_item)
+        elif item.level < prev_item.level:
+            last_top = last_top_processed.pop()
+            new_item = Item(
+                name=last_top.raw_material,
+                level=last_top.level,
+                raw_material=item.raw_material,
+                quantity=item.quantity,
+                unit=item.unit,
+            )
+            processed_items.append(new_item)
+            last_top_processed.append(last_top)
     return processed_items
 
 
